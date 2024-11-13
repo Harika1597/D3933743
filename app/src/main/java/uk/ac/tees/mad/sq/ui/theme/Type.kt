@@ -2,10 +2,15 @@ package uk.ac.tees.mad.sq.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import uk.ac.tees.mad.sq.R
 
+val permanentMarker = FontFamily(
+    Font(R.font.permanentmarker_regular)
+)
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
