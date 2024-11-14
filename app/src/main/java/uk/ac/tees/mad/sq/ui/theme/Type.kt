@@ -11,6 +11,10 @@ import uk.ac.tees.mad.sq.R
 val permanentMarker = FontFamily(
     Font(R.font.permanentmarker_regular)
 )
+val poppins = FontFamily(
+    Font(R.font.poppins_regular),
+    Font(R.font.poppins_semibold, FontWeight.SemiBold)
+)
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(

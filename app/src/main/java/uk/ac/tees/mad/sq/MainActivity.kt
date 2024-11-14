@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import uk.ac.tees.mad.sq.screen.LoginScreen
 import uk.ac.tees.mad.sq.screen.SplashScreen
 import uk.ac.tees.mad.sq.ui.theme.SmartQuizTheme
 
@@ -49,6 +50,9 @@ fun QuizApp(){
         ) {
             composable(route = QuizNavigation.SplashScreen.route) {
                 SplashScreen(navController)
+            }
+            composable(route = QuizNavigation.LoginScreen.route){
+                LoginScreen(navController)
             }
         }
     }
