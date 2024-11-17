@@ -59,6 +59,11 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
 
+    implementation("androidx.compose.ui:ui:1.7.1")
+    implementation("androidx.compose.material:material-icons-extended:1.7.1")
+
+   // implementation {"androidx.compose.material:material-icons-extended:1.7.1"}
+
 
     //Dagger-Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
