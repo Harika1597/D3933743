@@ -2,7 +2,6 @@ package uk.ac.tees.mad.sq.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,24 +31,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import uk.ac.tees.mad.sq.QuizNavigation
+import androidx.navigation.NavHostController
 import uk.ac.tees.mad.sq.R
 import uk.ac.tees.mad.sq.ui.theme.poppins
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun RegistrationScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val isPasswordVisible = remember {
         mutableStateOf(false)
@@ -62,19 +59,19 @@ fun LoginScreen(navController: NavController) {
         Row(modifier = Modifier.padding(top = 50.dp)) {
             Spacer(modifier = Modifier.weight(1f))
             Text(
-                text = "Don't have an account?",
+                text = "Already have an account?",
                 fontFamily = poppins,
                 fontSize = 12.sp,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Spacer(modifier = Modifier.width(10.dp))
             Button(
-                onClick = { navController.navigate(QuizNavigation.SignupScreen.route) },
+                onClick = { navController.popBackStack() },
                 elevation = ButtonDefaults.buttonElevation(10.dp),
                 modifier = Modifier.align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "Get Started",
+                    text = "Sign in",
                     fontFamily = poppins,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold
@@ -114,9 +111,9 @@ fun LoginScreen(navController: NavController) {
                     .background(colorScheme.tertiary),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(80.dp))
+                Spacer(modifier = Modifier.height(50.dp))
                 Text(
-                    text = "Welcome Back",
+                    text = "Get Started",
                     fontFamily = poppins,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 28.sp
@@ -132,6 +129,14 @@ fun LoginScreen(navController: NavController) {
                     onValueChange = { email = it },
                     shape = RoundedCornerShape(30.dp),
                     label = { Text(text = "Email Address") },
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    shape = RoundedCornerShape(30.dp),
+                    label = { Text(text = "Your Name") },
                     singleLine = true
                 )
                 Spacer(modifier = Modifier.height(20.dp))

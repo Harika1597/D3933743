@@ -4,18 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import uk.ac.tees.mad.sq.screen.LoginScreen
+import uk.ac.tees.mad.sq.screen.RegistrationScreen
 import uk.ac.tees.mad.sq.screen.SplashScreen
 import uk.ac.tees.mad.sq.ui.theme.SmartQuizTheme
 
@@ -53,6 +48,9 @@ fun QuizApp(){
             }
             composable(route = QuizNavigation.LoginScreen.route){
                 LoginScreen(navController)
+            }
+            composable(route = QuizNavigation.SignupScreen.route){
+                RegistrationScreen(navController)
             }
         }
     }
