@@ -22,10 +22,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +38,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -46,13 +49,24 @@ import androidx.navigation.NavController
 import uk.ac.tees.mad.sq.QuizNavigation
 import uk.ac.tees.mad.sq.R
 import uk.ac.tees.mad.sq.ui.theme.poppins
+import uk.ac.tees.mad.sq.viewmodel.QuizViewModel
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, viewModel: QuizViewModel) {
+    val context = LocalContext.current
+    val loading = viewModel.loading
+    val signed = viewModel.loggedIn
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val isPasswordVisible = remember {
         mutableStateOf(false)
+    }
+    LaunchedEffect(signed.value) {
+        if (signed.value) {
+            navController.navigate(QuizNavigation.HomeScreen.route) {
+                popUpTo(0)
+            }
+        }
     }
     Column(
         modifier = Modifier
@@ -77,7 +91,7 @@ fun LoginScreen(navController: NavController) {
                     text = "Get Started",
                     fontFamily = poppins,
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
+                    color = Color.White
                 )
             }
         }
@@ -155,7 +169,7 @@ fun LoginScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(40.dp))
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { viewModel.login(context, email, password) },
                     shape = RoundedCornerShape(40.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -163,7 +177,13 @@ fun LoginScreen(navController: NavController) {
                         .padding(horizontal = 60.dp)
                         .shadow(20.dp, RoundedCornerShape(40.dp))
                 ) {
-                    Text(text = "Sign in", fontFamily = poppins)
+                    if (loading.value){
+                        LinearProgressIndicator()
+                    }else {
+                        Text(
+                            text = "Sign in", fontFamily = poppins, color = Color.White
+                        )
+                    }
                 }
             }
         }

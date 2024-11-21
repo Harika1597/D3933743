@@ -6,14 +6,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
+import uk.ac.tees.mad.sq.screen.HomeScreen
 import uk.ac.tees.mad.sq.screen.LoginScreen
 import uk.ac.tees.mad.sq.screen.RegistrationScreen
 import uk.ac.tees.mad.sq.screen.SplashScreen
 import uk.ac.tees.mad.sq.ui.theme.SmartQuizTheme
+import uk.ac.tees.mad.sq.viewmodel.QuizViewModel
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +44,7 @@ enum class QuizNavigation(val route : String){
 fun QuizApp(){
     Surface {
         val navController = rememberNavController()
+        val viewModel : QuizViewModel = viewModel()
         NavHost(
             navController = navController,
             startDestination = QuizNavigation.SplashScreen.route
@@ -47,10 +53,13 @@ fun QuizApp(){
                 SplashScreen(navController)
             }
             composable(route = QuizNavigation.LoginScreen.route){
-                LoginScreen(navController)
+                LoginScreen(navController, viewModel)
             }
             composable(route = QuizNavigation.SignupScreen.route){
-                RegistrationScreen(navController)
+                RegistrationScreen(navController,viewModel)
+            }
+            composable(route = QuizNavigation.HomeScreen.route){
+                HomeScreen(navController,viewModel)
             }
         }
     }
