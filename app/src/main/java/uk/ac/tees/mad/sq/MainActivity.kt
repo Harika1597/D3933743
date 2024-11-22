@@ -50,7 +50,7 @@ fun QuizApp(){
             startDestination = QuizNavigation.SplashScreen.route
         ) {
             composable(route = QuizNavigation.SplashScreen.route) {
-                SplashScreen(navController)
+                SplashScreen(navController, viewModel)
             }
             composable(route = QuizNavigation.LoginScreen.route){
                 LoginScreen(navController, viewModel)

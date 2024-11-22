@@ -23,12 +23,22 @@ import uk.ac.tees.mad.sq.QuizApp
 import uk.ac.tees.mad.sq.QuizNavigation
 import uk.ac.tees.mad.sq.R
 import uk.ac.tees.mad.sq.ui.theme.permanentMarker
+import uk.ac.tees.mad.sq.viewmodel.QuizViewModel
 
 @Composable
-fun SplashScreen(navController: NavController) {
+fun SplashScreen(navController: NavController, viewModel : QuizViewModel) {
+    val logged = viewModel.loggedIn
     LaunchedEffect(key1 = true) {
-      delay(2000L)
-      navController.navigate(QuizNavigation.LoginScreen.route)
+        delay(2000L)
+        if (logged.value) {
+            navController.navigate(QuizNavigation.HomeScreen.route){
+                popUpTo(0)
+            }
+        } else {
+            navController.navigate(QuizNavigation.LoginScreen.route){
+                popUpTo(0)
+            }
+        }
     }
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,

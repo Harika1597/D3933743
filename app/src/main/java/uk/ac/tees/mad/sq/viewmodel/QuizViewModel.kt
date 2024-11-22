@@ -19,6 +19,12 @@ class QuizViewModel @Inject constructor(
     val loggedIn = mutableStateOf(false)
     val loading = mutableStateOf(false)
 
+    init {
+        if (auth.currentUser != null) {
+            loggedIn.value = true
+        }
+    }
+
     fun signUp(context: Context, email: String, name: String, password: String) {
         loading.value = true
         repository.signUp(email, name, password, onSuccess = {
