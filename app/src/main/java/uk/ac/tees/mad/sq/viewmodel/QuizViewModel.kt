@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import uk.ac.tees.mad.sq.data.User
 import uk.ac.tees.mad.sq.repository.MainRepository
 import javax.inject.Inject
 
@@ -18,6 +19,7 @@ class QuizViewModel @Inject constructor(
 
     val loggedIn = mutableStateOf(false)
     val loading = mutableStateOf(false)
+    val userInformation = mutableStateOf(User())
 
     init {
         if (auth.currentUser != null) {
@@ -29,6 +31,7 @@ class QuizViewModel @Inject constructor(
         loading.value = true
         repository.signUp(email, name, password, onSuccess = {
             loggedIn.value = true
+            fetchUserData()
             loading.value = false
         }, onFailure = {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -41,11 +44,20 @@ class QuizViewModel @Inject constructor(
         loading.value = true
         repository.login(email, password, onSuccess = {
             loggedIn.value = true
+            fetchUserData()
             loading.value = false
         }, onFailure = {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             Log.d("LOGIN", "login: $it")
             loading.value = false
+        })
+    }
+
+    fun fetchUserData(){
+        repository.fetchUserData(onSuccess = {
+            userInformation.value = it
+        },onFailure = {
+            Log.d("FETCHUSERDATA", "fetchUserData: $it")
         })
     }
 }

@@ -35,4 +35,22 @@ class MainRepository @Inject constructor(
         }
     }
 
+    fun fetchUserData(onSuccess: (User) -> Unit, onFailure: (String) -> Unit) {
+        firestore.collection("users").document(auth.currentUser!!.uid).get().addOnSuccessListener {
+            onSuccess(
+                User(
+                    id = it.getString("id")!!,
+                    profilePictureUrl = it.getString("profilePictureUrl")!!,
+                    name = it.getString("name")!!,
+                    email = it.getString("email")!!,
+                    password = it.getString("password")!!
+                )
+            )
+        }.addOnFailureListener {
+            onFailure(
+                it.localizedMessage ?: "Unknown error occurred"
+            )
+        }
+    }
+
 }
