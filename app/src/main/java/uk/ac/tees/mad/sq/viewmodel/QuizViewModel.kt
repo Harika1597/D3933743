@@ -24,6 +24,7 @@ class QuizViewModel @Inject constructor(
     init {
         if (auth.currentUser != null) {
             loggedIn.value = true
+            fetchUserData()
         }
     }
 
