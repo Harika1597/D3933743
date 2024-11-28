@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import kotlinx.coroutines.delay
 import uk.ac.tees.mad.sq.R
 import uk.ac.tees.mad.sq.categoryList
 import uk.ac.tees.mad.sq.data.Category
@@ -66,6 +67,20 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
     )
     val userInfo = viewModel.userInformation
     val quizList = viewModel.quizData
+    var isLoading by remember { mutableStateOf(false) }
+    val isClicked = remember {
+        mutableStateOf(false)
+    }
+    val isClickable = remember {
+        mutableStateOf(true)
+    }
+    LaunchedEffect(key1 = isClicked.value) {
+        if(isClickable.value){
+            isClickable.value = false
+            delay(10000L)
+            isClickable.value = true
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -121,7 +136,15 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
             )
             LazyRow {
                 items(categoryList) { category ->
-                    CategoryView(category = category)
+                    CategoryView(category = category, onCategoryClick = {
+                        if (!isLoading) {
+                            isLoading = true
+                            isClicked.value = !isClicked.value
+                            viewModel.fetchFromApi(category.id) {
+                                isLoading = false
+                            }
+                        }
+                    },isClickale = isClickable.value)
                 }
             }
         }
@@ -130,15 +153,36 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                 text = "Choose Quiz", fontFamily = poppins, fontSize = 20.sp, color = Color.White,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
-            if (quizList.value != null) {
-                LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                    items(quizList.value!!.results) { quiz ->
-                        QuizCard(quiz = quiz)
-                    }
-                }
-            } else {
+            if (isLoading){
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
+                }
+            }else {
+                if (quizList.value != null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = quizList.value!!.results.get(0).category,
+                            fontFamily = permanentMarker
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "Difficulty: " + quizList.value!!.results.get(0).difficulty,
+                            fontFamily = permanentMarker
+                        )
+                    }
+                    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                        items(quizList.value!!.results) { quiz ->
+                            QuizCard(quiz = quiz)
+                        }
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(text = "No Data")
+                    }
                 }
             }
         }
@@ -146,11 +190,7 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
 }
 
 @Composable
-fun QuizCard(quiz: Result) {
-    val optionList = remember {
-        mutableListOf(quiz.incorrect_answers.random(), quiz.incorrect_answers.random(), quiz.correct_answer)
-    }
-    Log.d("QUIZCARD", "QuizCard: $optionList")
+fun QuizCard(quiz: Result ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -173,7 +213,7 @@ fun QuizCard(quiz: Result) {
             Text(
                 text = quiz.question,
                 fontFamily = poppins,
-                fontSize = 22.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = colorScheme.onSurface
             )
@@ -182,7 +222,7 @@ fun QuizCard(quiz: Result) {
 }
 
 @Composable
-fun CategoryView(category: Category) {
+fun CategoryView(category: Category, onCategoryClick: () -> Unit, isClickale: Boolean) {
     var isClicked by remember { mutableStateOf(false) }
 
     val scale by animateFloatAsState(
@@ -202,9 +242,9 @@ fun CategoryView(category: Category) {
                 .size(80.dp)
                 .scale(scale)
                 .clip(RoundedCornerShape(16.dp))
-                .clickable {
-
+                .clickable(enabled = isClickale) {
                     isClicked = !isClicked
+                    onCategoryClick()
                 },
             colors = CardDefaults.cardColors(
                 containerColor = colorScheme.tertiary.copy(alpha = 0.5f)

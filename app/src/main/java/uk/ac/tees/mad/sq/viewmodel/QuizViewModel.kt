@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.sq.data.QuizApi
 import uk.ac.tees.mad.sq.data.User
@@ -26,12 +27,24 @@ class QuizViewModel @Inject constructor(
     val loading = mutableStateOf(false)
     val userInformation = mutableStateOf(User())
     val quizData = mutableStateOf<QuizData?>(null)
+    private var fetchJob: Job? = null
+
 
     init {
         if (auth.currentUser != null) {
             loggedIn.value = true
             fetchUserData()
-            fetchFromApi()
+            fetchInitialData()
+        }
+    }
+
+    private fun fetchInitialData() {
+        viewModelScope.launch {
+            try {
+                quizData.value = quizApi.getQuiz(10, 9, "easy").body()
+            } catch (e: Exception) {
+                Log.d("FETCHINITIALDATA", "fetchInitialData: ${e.message}")
+            }
         }
     }
 
@@ -61,11 +74,18 @@ class QuizViewModel @Inject constructor(
         })
     }
 
-    fun fetchFromApi() {
-        viewModelScope.launch {
-            val response = quizApi.getQuiz(10, 9, "easy")
-            quizData.value = response.body()
-            Log.d("FETCHFROMAPI", "fetchFromApi: ${quizData.value}")
+    fun fetchFromApi(category : String = "9",onComplete: () -> Unit) {
+        fetchJob?.cancel()
+        val cat = category.toInt()
+        fetchJob = viewModelScope.launch {
+            try {
+                val response = quizApi.getQuiz(10, cat, "easy")
+                quizData.value = response.body()
+
+            } catch (e: Exception) {
+            } finally {
+                onComplete()
+            }
         }
     }
 
