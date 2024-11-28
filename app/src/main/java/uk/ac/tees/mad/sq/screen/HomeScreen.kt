@@ -50,8 +50,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import uk.ac.tees.mad.sq.QuizNavigation
 import uk.ac.tees.mad.sq.R
+import uk.ac.tees.mad.sq.buildProjectDetailRoute
 import uk.ac.tees.mad.sq.categoryList
 import uk.ac.tees.mad.sq.data.Category
 import uk.ac.tees.mad.sq.data.remote.Result
@@ -125,7 +130,7 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                 Text(text = "Expert", fontFamily = poppins, fontSize = 12.sp, color = Color.White)
             }
         }
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(1.dp))
         Column(modifier = Modifier.padding(4.dp)) {
             Text(
                 text = "Quiz",
@@ -162,21 +167,26 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(50.dp)
                             .padding(12.dp)
                     ) {
                         Text(
                             text = quizList.value!!.results.get(0).category,
-                            fontFamily = permanentMarker
+                            fontFamily = permanentMarker,
+                            fontSize = 12.sp
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
                             text = "Difficulty: " + quizList.value!!.results.get(0).difficulty,
-                            fontFamily = permanentMarker
+                            fontFamily = permanentMarker,
+                            fontSize = 12.sp
                         )
                     }
                     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                         items(quizList.value!!.results) { quiz ->
-                            QuizCard(quiz = quiz)
+                            QuizCard(quiz = quiz, onQuizClicked = {
+                                navigateToQuizScreen(navController,quiz)
+                                           })
                         }
                     }
                 } else {
@@ -190,7 +200,7 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
 }
 
 @Composable
-fun QuizCard(quiz: Result ) {
+fun QuizCard(quiz: Result, onQuizClicked:()-> Unit ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -198,7 +208,7 @@ fun QuizCard(quiz: Result ) {
             .clip(RoundedCornerShape(16.dp))
             .padding(8.dp)
             .clickable {
-
+                onQuizClicked()
             },
         colors = CardDefaults.cardColors(
             containerColor = colorScheme.tertiary.copy(alpha = 0.5f)
@@ -269,4 +279,9 @@ fun CategoryView(category: Category, onCategoryClick: () -> Unit, isClickale: Bo
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
     }
+}
+
+fun navigateToQuizScreen(navController: NavHostController, quiz : Result) {
+    val route = buildProjectDetailRoute(quiz)
+    navController.navigate(route)
 }

@@ -4,6 +4,8 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.google.gms.google.services)
+    id ("org.jetbrains.kotlin.plugin.serialization") // <- Ensure this is here
+
 }
 
 android {
@@ -62,6 +64,8 @@ dependencies {
     val nav_version = "2.7.7"
     implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     implementation("androidx.compose.ui:ui:1.7.1")
     implementation("androidx.compose.material:material-icons-extended:1.7.1")
