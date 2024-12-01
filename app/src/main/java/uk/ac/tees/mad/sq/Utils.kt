@@ -3,7 +3,7 @@ package uk.ac.tees.mad.sq
 import uk.ac.tees.mad.sq.data.Category
 
 
-
+//fg
 val categoryList = mutableListOf<Category>(
     Category("25","Arts",R.drawable.art),
     Category("26","Celebrities",R.drawable.celebrity),
