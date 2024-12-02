@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -38,7 +39,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import uk.ac.tees.mad.sq.QuizNavigation
 import uk.ac.tees.mad.sq.R
+import uk.ac.tees.mad.sq.buildProjectDetailRoute
+import uk.ac.tees.mad.sq.buildResultRoute
 import uk.ac.tees.mad.sq.data.remote.Result
 import uk.ac.tees.mad.sq.ui.theme.permanentMarker
 import uk.ac.tees.mad.sq.ui.theme.poppins
@@ -73,7 +77,11 @@ fun QuizScreen(navController: NavHostController, viewModel: QuizViewModel, quizD
                 Icon(
                     imageVector = Icons.Rounded.KeyboardArrowLeft,
                     contentDescription = "",
-                    modifier = Modifier.size(40.dp),
+                    modifier = Modifier.size(40.dp).clickable {
+                        navController.navigate(QuizNavigation.HomeScreen.route){
+                            popUpTo(0)
+                        }
+                    },
                     tint = Color.Black
                 )
             }
@@ -112,7 +120,7 @@ fun QuizScreen(navController: NavHostController, viewModel: QuizViewModel, quizD
                 Text(
                     text = quizData.question,
                     fontFamily = poppins,
-                    fontSize = 22.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
                     modifier = Modifier
@@ -131,6 +139,12 @@ fun QuizScreen(navController: NavHostController, viewModel: QuizViewModel, quizD
                         }
                     )
                 }
+                Spacer(modifier = Modifier.height(30.dp))
+                Button(onClick = {
+                    if (selectedOption.value.isNotEmpty()) {navigateToResultScreen(navController,quizData,selectedOption.value) }
+                                 }, shape = RoundedCornerShape(30.dp), modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "Next", fontFamily = permanentMarker, color = Color.White, fontSize = 22.sp)
+                }
             }
         }
     }
@@ -142,13 +156,19 @@ fun optionChoose(option: String, selectedOption: String, onOptionClick: () -> Un
         .fillMaxWidth()
         .height(50.dp)
         .padding(4.dp)
-        .border(1.dp,if (option == selectedOption) Color.Green else Color.LightGray, RoundedCornerShape(20.dp))
+        .border(
+            1.dp,
+            if (option == selectedOption) Color.Green else Color.LightGray,
+            RoundedCornerShape(20.dp)
+        )
         .clip(RoundedCornerShape(20.dp))
         .background(if (option == selectedOption) Color(0xFF90EE90) else Color.White)
         .clickable {
             onOptionClick()
         }) {
-        Row(modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(20.dp))) {
+        Row(modifier = Modifier
+            .fillMaxSize()
+            .clip(RoundedCornerShape(20.dp))) {
             Text(
                 text = option,
                 fontFamily = permanentMarker,
@@ -180,4 +200,9 @@ fun getShuffledAnswers(result: Result): List<String> {
     allAnswers.shuffle(Random(System.currentTimeMillis()))
 
     return allAnswers
+}
+
+fun navigateToResultScreen(navController: NavHostController, quiz : Result,selectedOption: String) {
+    val route = buildResultRoute(selectedOption,quiz)
+    navController.navigate(route)
 }

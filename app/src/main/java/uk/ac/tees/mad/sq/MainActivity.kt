@@ -15,12 +15,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.serialization.json.Json
 import uk.ac.tees.mad.sq.data.remote.Result
 import uk.ac.tees.mad.sq.screen.HomeScreen
 import uk.ac.tees.mad.sq.screen.LoginScreen
 import uk.ac.tees.mad.sq.screen.QuizScreen
 import uk.ac.tees.mad.sq.screen.RegistrationScreen
+import uk.ac.tees.mad.sq.screen.ResultScreen
 import uk.ac.tees.mad.sq.screen.SplashScreen
 import uk.ac.tees.mad.sq.ui.theme.SmartQuizTheme
 import uk.ac.tees.mad.sq.viewmodel.QuizViewModel
@@ -42,6 +42,12 @@ fun buildProjectDetailRoute(quiz : Result): String {
     val projectJson = Uri.encode(Gson().toJson(quiz))
     return "${QuizNavigation.QuizScreen.route}/$projectJson"
 }
+
+fun buildResultRoute(selectedOption: String, quizData: Result): String {
+    val resultJson = Uri.encode(Gson().toJson(quizData))
+    return "${QuizNavigation.ResultScreen.route}/$selectedOption/$resultJson"
+}
+
 
 enum class QuizNavigation(val route : String){
     SplashScreen("splash_screen"),
@@ -83,8 +89,26 @@ fun QuizApp(){
                 val result = Gson().fromJson(resultJson, Result::class.java)
                 QuizScreen(navController, viewModel, result)
             }
-            composable(route = QuizNavigation.ResultScreen.route){
-//                ResultScreen(navController,viewModel)
+            composable(
+                route = "${QuizNavigation.ResultScreen.route}/{selectedOption}/{resultJson}",
+                arguments = listOf(
+                    navArgument("selectedOption") {
+                        type = NavType.StringType
+                    },
+                    navArgument("resultJson") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { backStackEntry ->
+                // Get the selectedOption and resultJson from the arguments
+                val selectedOption = backStackEntry.arguments?.getString("selectedOption")
+                val resultJson = backStackEntry.arguments?.getString("resultJson")
+
+                // Parse the JSON string back to the Result object
+                val quizData = Gson().fromJson(resultJson, Result::class.java)
+
+                // Pass the arguments to the ResultScreen
+                ResultScreen(navController = navController, viewModel = viewModel, selectedOption = selectedOption, quizData = quizData)
             }
         }
     }
