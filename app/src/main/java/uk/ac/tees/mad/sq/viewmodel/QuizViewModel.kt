@@ -3,6 +3,7 @@ package uk.ac.tees.mad.sq.viewmodel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,13 +29,33 @@ class QuizViewModel @Inject constructor(
     val userInformation = mutableStateOf(User())
     val quizData = mutableStateOf<QuizData?>(null)
     private var fetchJob: Job? = null
-
+    private val _points = mutableStateOf(0)
+    val points: State<Int> get() = _points
 
     init {
         if (auth.currentUser != null) {
             loggedIn.value = true
             fetchUserData()
             fetchInitialData()
+            loadPoints()
+        }
+    }
+
+    fun addAnswer(questionId: String) {
+        viewModelScope.launch {
+            if (!repository.isQuestionAnswered(questionId)) {
+                    repository.addPoints(5)
+                    _points.value = repository.getPoints()
+                Log.d("Point", "addAnswer: ${_points.value}")
+                repository.saveAnswer(questionId)
+            }
+        }
+    }
+
+    fun loadPoints() {
+        viewModelScope.launch {
+            _points.value = repository.getPoints()
+            Log.d("POINTS", "loadPoints: $_points")
         }
     }
 

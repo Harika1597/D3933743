@@ -10,6 +10,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardArrowLeft
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,11 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import uk.ac.tees.mad.sq.QuizNavigation
 import uk.ac.tees.mad.sq.R
 import uk.ac.tees.mad.sq.data.remote.Result
 import uk.ac.tees.mad.sq.ui.theme.permanentMarker
@@ -51,7 +59,7 @@ fun ResultScreen(
     navController: NavHostController,
     viewModel: QuizViewModel,
     selectedOption: String?,
-    quizData: Result
+    quizData: Result,
 ) {
     val backgroundColor = listOf(
         colorScheme.primary,
@@ -72,11 +80,23 @@ fun ResultScreen(
                     colorScheme.tertiary
                 )
         ) {
-            Spacer(modifier = Modifier.height(80.dp))
+            Icon(
+                imageVector = Icons.Rounded.KeyboardArrowLeft,
+                contentDescription = "null",
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(20.dp)
+                    .clickable {
+                        navController.popBackStack()
+                    }
+            )
+            Spacer(modifier = Modifier.height(160.dp))
             if (selectedOption == quizData.correct_answer) {
                 CorrectAnsTemplate(correctAns = quizData.correct_answer)
-            }else{
-                WrongAnsTemplate()
+            } else {
+                WrongAnsTemplate(onRetryClick = {
+                    navController.popBackStack()
+                })
             }
         }
     }
@@ -120,13 +140,21 @@ fun CorrectAnsTemplate(correctAns: String) {
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier.padding(horizontal = 50.dp)
         )
+        Spacer(modifier = Modifier.height(20.dp))
+        Button(
+            onClick = { /*TODO*/ }, shape = RoundedCornerShape(20.dp), modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(20.dp)
+        ) {
+            Text(text = "Save", fontFamily = permanentMarker, fontSize = 22.sp)
+        }
     }
 }
 
 
-
 @Composable
-fun WrongAnsTemplate() {
+fun WrongAnsTemplate(onRetryClick: () -> Unit) {
     val infiniteTransition = rememberInfiniteTransition()
 
     val offsetX by infiniteTransition.animateFloat(
@@ -157,5 +185,17 @@ fun WrongAnsTemplate() {
             fontSize = 22.sp,
             modifier = Modifier.padding(50.dp)
         )
+        Spacer(modifier = Modifier.height(20.dp))
+        Button(
+            onClick = { onRetryClick() },
+            colors = ButtonDefaults.buttonColors(Color.Red),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .padding(20.dp)
+        ) {
+            Text(text = "Retry", fontFamily = permanentMarker, fontSize = 22.sp)
+        }
     }
 }

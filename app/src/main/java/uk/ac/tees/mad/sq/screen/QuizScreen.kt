@@ -141,8 +141,13 @@ fun QuizScreen(navController: NavHostController, viewModel: QuizViewModel, quizD
                 }
                 Spacer(modifier = Modifier.height(30.dp))
                 Button(onClick = {
-                    if (selectedOption.value.isNotEmpty()) {navigateToResultScreen(navController,quizData,selectedOption.value) }
-                                 }, shape = RoundedCornerShape(30.dp), modifier = Modifier.fillMaxWidth()) {
+                    if (selectedOption.value.isNotEmpty()) {
+                        if (selectedOption.value == quizData.correct_answer){
+                            Log.d("Correct","Updating ")
+                            viewModel.addAnswer(quizData.question)
+                        }
+                        navigateToResultScreen(navController,quizData,selectedOption.value)
+                    } }, shape = RoundedCornerShape(30.dp), modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Next", fontFamily = permanentMarker, color = Color.White, fontSize = 22.sp)
                 }
             }
