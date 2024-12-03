@@ -29,6 +29,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -72,6 +73,7 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
     )
     val userInfo = viewModel.userInformation
     val quizList = viewModel.quizData
+    val userPoints = viewModel.points
     var isLoading by remember { mutableStateOf(false) }
     val isClicked = remember {
         mutableStateOf(false)
@@ -80,7 +82,7 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
         mutableStateOf(true)
     }
     LaunchedEffect(key1 = isClicked.value) {
-        if(isClickable.value){
+        if (isClickable.value) {
             isClickable.value = false
             delay(10000L)
             isClickable.value = true
@@ -127,7 +129,43 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                     fontSize = 20.sp,
                     color = Color.White
                 )
-                Text(text = "Expert", fontFamily = poppins, fontSize = 12.sp, color = Color.White)
+                Text(text = if (userPoints.value > 100) "Expert" else "Beginner", fontFamily = poppins, fontSize = 12.sp, color = Color.White)
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Box(
+                modifier = Modifier
+                    .height(100.dp)
+                    .width(125.dp)
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(Color.White)
+                    .clickable {  }
+            ) {
+                Row {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .padding(4.dp)
+                            .size(55.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFFFA800))
+                            ,
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.flash),
+                            contentDescription = null, modifier = Modifier.size(40.dp).align(Alignment.Center),
+                            tint = Color.White
+                        )
+                    }
+                    Text(
+                        text = userPoints.value.toString(),
+                        fontFamily = poppins,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        color = Color.Black,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(1.dp))
@@ -149,7 +187,7 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                                 isLoading = false
                             }
                         }
-                    },isClickale = isClickable.value)
+                    }, isClickale = isClickable.value)
                 }
             }
         }
@@ -158,11 +196,11 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                 text = "Choose Quiz", fontFamily = poppins, fontSize = 20.sp, color = Color.White,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
-            if (isLoading){
+            if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
-            }else {
+            } else {
                 if (quizList.value != null) {
                     Row(
                         modifier = Modifier
@@ -185,8 +223,8 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                     LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                         items(quizList.value!!.results) { quiz ->
                             QuizCard(quiz = quiz, onQuizClicked = {
-                                navigateToQuizScreen(navController,quiz)
-                                           })
+                                navigateToQuizScreen(navController, quiz)
+                            })
                         }
                     }
                 } else {
@@ -200,7 +238,7 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
 }
 
 @Composable
-fun QuizCard(quiz: Result, onQuizClicked:()-> Unit ) {
+fun QuizCard(quiz: Result, onQuizClicked: () -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
@@ -281,7 +319,7 @@ fun CategoryView(category: Category, onCategoryClick: () -> Unit, isClickale: Bo
     }
 }
 
-fun navigateToQuizScreen(navController: NavHostController, quiz : Result) {
+fun navigateToQuizScreen(navController: NavHostController, quiz: Result) {
     val route = buildProjectDetailRoute(quiz)
     navController.navigate(route)
 }
