@@ -109,6 +109,9 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                         .align(Alignment.CenterVertically)
                         .clip(CircleShape)
                         .border(1.dp, Color.White, CircleShape)
+                        .clickable {
+                            navController.navigate(QuizNavigation.ProfileScreen.route)
+                        }
                 )
             } else {
                 Image(
@@ -119,6 +122,9 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                         .align(Alignment.CenterVertically)
                         .clip(CircleShape)
                         .border(1.dp, Color.White, CircleShape)
+                        .clickable {
+                            navController.navigate(QuizNavigation.ProfileScreen.route)
+                        }
                 )
             }
             Spacer(modifier = Modifier.width(5.dp))
@@ -127,7 +133,10 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                     text = userInfo.value.name,
                     fontFamily = poppins,
                     fontSize = 20.sp,
-                    color = Color.White
+                    color = Color.White,
+                    modifier = Modifier.clickable {
+                        navController.navigate(QuizNavigation.ProfileScreen.route)
+                    }
                 )
                 Text(text = if (userPoints.value > 100) "Expert" else "Beginner", fontFamily = poppins, fontSize = 12.sp, color = Color.White)
             }
@@ -138,7 +147,9 @@ fun HomeScreen(navController: NavHostController, viewModel: QuizViewModel) {
                     .width(125.dp)
                     .clip(RoundedCornerShape(30.dp))
                     .background(Color.White)
-                    .clickable {  }
+                    .clickable {
+
+                    }
             ) {
                 Row {
                     Box(

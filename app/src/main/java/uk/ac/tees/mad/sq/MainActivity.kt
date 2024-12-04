@@ -18,6 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import uk.ac.tees.mad.sq.data.remote.Result
 import uk.ac.tees.mad.sq.screen.HomeScreen
 import uk.ac.tees.mad.sq.screen.LoginScreen
+import uk.ac.tees.mad.sq.screen.ProfileScreen
 import uk.ac.tees.mad.sq.screen.QuizScreen
 import uk.ac.tees.mad.sq.screen.RegistrationScreen
 import uk.ac.tees.mad.sq.screen.ResultScreen
@@ -55,7 +56,8 @@ enum class QuizNavigation(val route : String){
     SignupScreen("signup_screen"),
     HomeScreen("home_screen"),
     QuizScreen("quiz_screen"),
-    ResultScreen("result_screen")
+    ResultScreen("result_screen"),
+    ProfileScreen("profile_screen")
 }
 
 @Composable
@@ -100,15 +102,15 @@ fun QuizApp(){
                     }
                 )
             ) { backStackEntry ->
-                // Get the selectedOption and resultJson from the arguments
                 val selectedOption = backStackEntry.arguments?.getString("selectedOption")
                 val resultJson = backStackEntry.arguments?.getString("resultJson")
 
-                // Parse the JSON string back to the Result object
                 val quizData = Gson().fromJson(resultJson, Result::class.java)
 
-                // Pass the arguments to the ResultScreen
                 ResultScreen(navController = navController, viewModel = viewModel, selectedOption = selectedOption, quizData = quizData)
+            }
+            composable(route = QuizNavigation.ProfileScreen.route){
+                ProfileScreen(navController,viewModel)
             }
         }
     }
