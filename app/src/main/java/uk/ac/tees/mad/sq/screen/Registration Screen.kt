@@ -65,6 +65,7 @@ fun RegistrationScreen(navController: NavHostController, viewModel: QuizViewMode
             navController.navigate(QuizNavigation.HomeScreen.route) {
                 popUpTo(0)
             }
+            viewModel.fetchInitialData()
         }
     }
     Column(

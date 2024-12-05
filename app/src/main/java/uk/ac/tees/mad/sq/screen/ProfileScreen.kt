@@ -1,5 +1,12 @@
 package uk.ac.tees.mad.sq.screen
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,16 +42,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import uk.ac.tees.mad.sq.QuizNavigation
@@ -52,9 +62,13 @@ import uk.ac.tees.mad.sq.R
 import uk.ac.tees.mad.sq.ui.theme.permanentMarker
 import uk.ac.tees.mad.sq.ui.theme.poppins
 import uk.ac.tees.mad.sq.viewmodel.QuizViewModel
+import java.io.File
 
 @Composable
 fun ProfileScreen(navController: NavHostController, viewModel: QuizViewModel) {
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var capturedImage by remember { mutableStateOf<Bitmap?>(null) }
+    val context = LocalContext.current
     val userPoint = viewModel.points
     val userInfo = viewModel.userInformation
     val name = remember { mutableStateOf(userInfo.value.name) }
@@ -69,22 +83,59 @@ fun ProfileScreen(navController: NavHostController, viewModel: QuizViewModel) {
         colorScheme.primary,
         colorScheme.tertiary
     )
+    val photoUri = remember {
+        mutableStateOf<Uri?>(null)
+    }
+    var temporaryImageUri: Uri? by remember { mutableStateOf(null) }
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            photoUri.value = temporaryImageUri
+            Log.d("ProfileScreen", "Image URI: ${photoUri.value}")
+            photoUri.value?.let { viewModel.addProfilePicture(context,it) }
+        } else {
+            Toast.makeText(context, "Picture taking failed!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Toast.makeText(context, "Camera permission granted", Toast.LENGTH_SHORT).show()
+            temporaryImageUri = getPhotoUri(context)
+            takePictureLauncher.launch(temporaryImageUri!!)
+
+        } else {
+            Toast.makeText(context, "Camera permission not granted", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     if (showAlertDialog.value) {
         when (actionType) {
             "Save" -> CommonAlertDialog(
                 title = "Save Changes",
                 message = "Are you sure you want to save changes",
-                onConfirm = { /*TODO*/ },
+                onConfirm = { viewModel.updateUserData(name.value, context)
+                            showAlertDialog.value = false},
                 onDismiss = { showAlertDialog.value = false })
 
             "Reset" -> CommonAlertDialog(title = "Reset Points",
                 message = "Are you sure you want to reset points",
-                onConfirm = { /*TODO*/ },
+                onConfirm = { viewModel.resetPoints()
+                    showAlertDialog.value = false},
                 onDismiss = { showAlertDialog.value = false })
 
             "Logout" -> CommonAlertDialog(title = "Logout",
                 message = "Are you sure you want to logout",
-                onConfirm = { /*TODO*/ },
+                onConfirm = {
+                    showAlertDialog.value = false
+                    navController.navigate(QuizNavigation.LoginScreen.route){
+                        popUpTo(0)
+                    }
+                    viewModel.LogOut()
+                },
                 onDismiss = { showAlertDialog.value = false})
         }
     }
@@ -118,6 +169,9 @@ fun ProfileScreen(navController: NavHostController, viewModel: QuizViewModel) {
                         .size(150.dp)
                         .clip(CircleShape)
                         .border(1.dp, Color.White, CircleShape)
+                        .clickable {
+                            permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                        }
                 )
             } else {
                 Image(
@@ -126,6 +180,9 @@ fun ProfileScreen(navController: NavHostController, viewModel: QuizViewModel) {
                         .size(150.dp)
                         .clip(CircleShape)
                         .border(1.dp, Color.White, CircleShape)
+                        .clickable {
+                            permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                        }
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -291,5 +348,14 @@ fun CommonAlertDialog(
                 Text(text = "No")
             }
         }
+    )
+}
+
+fun getPhotoUri(context: Context): Uri {
+    val photoFile = File(context.filesDir, "project_image_${System.currentTimeMillis()}.jpg")
+    return FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.provider",
+        photoFile
     )
 }

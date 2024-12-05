@@ -1,6 +1,7 @@
 package uk.ac.tees.mad.sq.viewmodel
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.State
@@ -42,8 +43,10 @@ class QuizViewModel @Inject constructor(
     }
 
     fun addAnswer(questionId: String) {
+        Log.d("ADDANSWERCalled", "addAnswer: $questionId")
         viewModelScope.launch {
             if (!repository.isQuestionAnswered(questionId)) {
+                Log.d("ADDANSWERConditionhit", "addAnswer: $questionId")
                     repository.addPoints(5)
                     _points.value = repository.getPoints()
                 Log.d("Point", "addAnswer: ${_points.value}")
@@ -59,10 +62,36 @@ class QuizViewModel @Inject constructor(
         }
     }
 
-    private fun fetchInitialData() {
+    fun resetPoints(){
+        viewModelScope.launch {
+            repository.resetPoints()
+            _points.value = repository.getPoints()
+        }
+    }
+
+    fun updateUserData(name: String,context: Context){
+        viewModelScope.launch {
+            repository.updateUserData(name, context)
+            fetchUserData()
+        }
+    }
+
+    fun LogOut(){
+        auth.signOut()
+        loggedIn.value = false
+    }
+
+    fun addProfilePicture(context: Context, uri : Uri) {
+        viewModelScope.launch {
+            repository.addProfilePicture(context, uri)
+            fetchUserData()
+        }
+    }
+
+    fun fetchInitialData() {
         viewModelScope.launch {
             try {
-                quizData.value = quizApi.getQuiz(10, 9, "easy").body()
+                quizData.value = quizApi.getQuiz(30, 9, "easy").body()
             } catch (e: Exception) {
                 Log.d("FETCHINITIALDATA", "fetchInitialData: ${e.message}")
             }
@@ -100,7 +129,7 @@ class QuizViewModel @Inject constructor(
         val cat = category.toInt()
         fetchJob = viewModelScope.launch {
             try {
-                val response = quizApi.getQuiz(10, cat, "easy")
+                val response = quizApi.getQuiz(30, cat, "easy")
                 quizData.value = response.body()
 
             } catch (e: Exception) {

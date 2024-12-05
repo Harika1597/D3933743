@@ -66,6 +66,7 @@ fun LoginScreen(navController: NavController, viewModel: QuizViewModel) {
             navController.navigate(QuizNavigation.HomeScreen.route) {
                 popUpTo(0)
             }
+            viewModel.fetchInitialData()
         }
     }
     Column(
