@@ -1,5 +1,9 @@
 package uk.ac.tees.mad.sq.screen
 
+import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -42,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -61,6 +66,7 @@ fun ResultScreen(
     selectedOption: String?,
     quizData: Result,
 ) {
+    val context = LocalContext.current
     val backgroundColor = listOf(
         colorScheme.primary,
         colorScheme.tertiary
@@ -94,6 +100,7 @@ fun ResultScreen(
             if (selectedOption == quizData.correct_answer) {
                 CorrectAnsTemplate(correctAns = quizData.correct_answer)
             } else {
+                triggerVibration(context)
                 WrongAnsTemplate(onRetryClick = {
                     navController.popBackStack()
                 })
@@ -196,6 +203,28 @@ fun WrongAnsTemplate(onRetryClick: () -> Unit) {
                 .padding(20.dp)
         ) {
             Text(text = "Retry", fontFamily = permanentMarker, fontSize = 22.sp)
+        }
+    }
+}
+
+
+private fun triggerVibration(context: Context) {
+    val vibrator = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+        try {
+            val vibratorManager = context.getSystemService(Context::class.java.getDeclaredField("VIBRATOR_MANAGER_SERVICE").get(null) as String)
+            (vibratorManager as VibratorManager).defaultVibrator
+        } catch (e: Exception) {
+            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+    } else {
+        context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    }
+    vibrator?.let {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            it.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE))
+        } else {
+            @Suppress("DEPRECATION")
+            it.vibrate(500)
         }
     }
 }
