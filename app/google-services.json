@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "544833155416",
-    "project_id": "smart-quiz-ac17c",
+    "project_number": "319376030519",
+    "project_id": "smartquiz-a5990",
     "storage_bucket": "smart-quiz-ac17c.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:544833155416:android:a6ae3e15bd3b9a8fcaf52d",
+        "mobilesdk_app_id": "1:319376030519:android:efcca1db06df0e52be38b2",
         "android_client_info": {
           "package_name": "uk.ac.tees.mad.sq"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBnV0oLvbWKMoF5G3k8v7Q8ZtTuKl-KoBk"
+          "current_key": "AIzaSyA49NpTOBrpdHoYg-q9UGaTEjaKPEAYnWw"
         }
       ],
       "services": {
